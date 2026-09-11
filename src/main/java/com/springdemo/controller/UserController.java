@@ -1,10 +1,18 @@
 package com.springdemo.controller;
 
 import com.springdemo.model.UserModel;
+import com.springdemo.service.JwtService;
 import com.springdemo.service.UserService;
+
+import jakarta.servlet.http.HttpSession;
+import jakarta.validation.Valid;
 
 import java.util.List;
 
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
+import org.springframework.security.authentication.AuthenticationManager;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -18,38 +26,70 @@ import org.springframework.web.bind.annotation.RestController;
 @RequestMapping("/users")
 public class UserController{
 	
-	private UserService userService;
+	private final UserService userService;
 	
 	public UserController(UserService userService) {
 		this.userService = userService;
 	}
 	
+	//Felhasználók lekérése ADMIN FUNKCIÓ
 	@GetMapping
-	public List<UserModel> getAll(){
-		return userService.getAll();
-	}
-	
-	//Új user létrehozása
-	@PostMapping
-	public UserModel createUser(@RequestBody UserModel user) {
-		return userService.createUser(user);
-	}
-	
-	//User lekérdezése
-	@GetMapping("/{id}")
-	public UserModel getUser(@PathVariable Long id) {
-		return userService.getUser(id);
-	}
-	
-	//User frissítése
-	@PutMapping("/{id}")
-	public UserModel updateUser(@PathVariable Long id, @RequestBody UserModel user) {
-		return userService.updateUser(id, user);
+	public ResponseEntity<List<UserModel>> getAll(){
+	    List<UserModel> users = userService.getAll();
+	    return ResponseEntity.ok(users);
 	}
 
-	//User törlése
+	
+	//Regisztrálás
+	@PostMapping("/register")
+	public ResponseEntity<UserModel> register(@Valid @RequestBody UserModel user) {
+		return ResponseEntity.status(HttpStatus.CREATED).body(userService.register(user));
+	}
+	
+	//Bejelentkezés
+	@PostMapping("/login")
+	public ResponseEntity<String> login(@RequestBody UserModel user) {
+		return ResponseEntity.ok(userService.login(user));
+	}
+	
+	//Kijelentkezés
+	@PostMapping("/logout")
+    public ResponseEntity<String> logout() {
+		if(true) {
+			return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("Nincs bejelentkezve felhasználó!");
+		}
+        return ResponseEntity.ok("Kijelentkeztetve: " + "asd" + "!");
+    }
+	
+	//Felhasználó frissítése
+	@PutMapping("/{id}")
+	public ResponseEntity<UserModel> updateUser(@PathVariable Long id, @RequestBody UserModel user)  {
+		UserModel updated = userService.updateUser(id, user);
+		if(updated == null) {
+			return ResponseEntity.notFound().build();
+		}
+		
+		return ResponseEntity.ok(updated);
+	}
+	
+	//Felhasználó keresése
+	@GetMapping("/{id}")
+	public ResponseEntity<UserModel> getUser(@PathVariable Long id){
+		UserModel foundUser = userService.getUser(id);
+		if(foundUser == null) {
+			return ResponseEntity.notFound().build();
+		}
+		return ResponseEntity.ok(foundUser);
+	}
+
+	//Felhasználó törlése
 	@DeleteMapping("/{id}")
-	public UserModel deleteUser(@PathVariable Long id) {
-		return userService.deleteUser(id);
+	public ResponseEntity<Void> deleteUser(@PathVariable Long id) {
+		boolean deleted = userService.deleteUser(id);
+		if(!deleted) {
+			return ResponseEntity.notFound().build();
+		}
+		
+		return ResponseEntity.noContent().build();
 	}
 }
