@@ -16,6 +16,8 @@ import org.springframework.security.web.authentication.UsernamePasswordAuthentic
 import com.springdemo.security.JwtAuthenticationFilter;
 import com.springdemo.service.CustomUserDetailsService;
 
+import jakarta.servlet.http.HttpServletResponse;
+
 @Configuration
 public class SecurityConfig {
 	@Bean
@@ -39,8 +41,26 @@ public class SecurityConfig {
 	            "/users/login",
 	            "/h2-console/**" //http://localhost:8080/h2-console
 	        ).permitAll()
+	        .requestMatchers("/users/admin/**").hasRole("ADMIN")
 	        .anyRequest().authenticated()
 	    )
+	    
+	    .exceptionHandling(exception -> exception
+
+	    	    // Nincs bejelentkezve
+	    	    .authenticationEntryPoint((request, response, ex) -> {
+	    	        response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
+	    	        response.setContentType("text/plain;charset=UTF-8");
+	    	        response.getWriter().write("Bejelentkezés szükséges!");
+	    	    })
+
+	    	    // Be van jelentkezve, de nincs jogosultsága
+	    	    .accessDeniedHandler((request, response, ex) -> {
+	    	        response.setStatus(HttpServletResponse.SC_FORBIDDEN);
+	    	        response.setContentType("text/plain;charset=UTF-8");
+	    	        response.getWriter().write("Nincs jogosultságod ehhez a művelethez!");
+	    	    })
+	    	)
 
 	    .addFilterBefore(jwtFilter, UsernamePasswordAuthenticationFilter.class)
 

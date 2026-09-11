@@ -8,6 +8,8 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.stereotype.Service;
 
+import com.springdemo.Exceptions.UserAlreadyExistsException;
+import com.springdemo.Exceptions.UserNotFoundException;
 import com.springdemo.model.UserModel;
 import com.springdemo.repository.UserRepository;
 
@@ -26,14 +28,10 @@ public class UserService{
 		this.jwtService = jwtService;
 	}
 	
-	public List<UserModel> getAll(){
-		return userRepository.findAll();
-	}
-	
 	public UserModel register(UserModel user) {
 		if(userRepository.getUserModelByUsername(user.getUsername()).isPresent() ||
 				userRepository.getUserModelByEmail(user.getEmail()).isPresent()) {
-			return null;//KÉSŐBB THROW ERROR
+			throw new UserAlreadyExistsException("Username or email already exists!");
 		}
 		user.setPassword(passwordEncoder.encode(user.getPassword()));
 		user.setRole("USER"); //Alapbol az legyen
@@ -52,30 +50,51 @@ public class UserService{
 	    return jwtService.generateToken(authentication.getName());
 	}
 	
+	public String logout(Authentication authentication) { //Gondolkoztam blacklisten, de ide nem éri meg
+	    String username = authentication.getName();
+	    return "User logged out successfully: " + username;
+	}
+	
+	//User Funkciók
+	
+	public UserModel profileSelf(Authentication authentication) {
+		String username = authentication.getName();
+		UserModel user = userRepository.getUserModelByUsername(username).orElseThrow(
+												() -> new UserNotFoundException("User not found!"));
+		return user;
+	}
+	
+	public String deleteSelf(Authentication authentication) {
+		String name = authentication.getName();
+		UserModel user = userRepository.getUserModelByUsername(name).orElseThrow(
+												() ->  new UserNotFoundException("User not found!"));
+		userRepository.delete(user);
+		logout(authentication);
+		return "User deleted Succesfully!";
+	}
+	
+	//ADMIN FUNKCIÓK
+	
+	public List<UserModel> getAll(){
+		return userRepository.findAll();
+	}
+	
 	public UserModel getUser(Long id) {
-		return userRepository.findById(id).orElse(null);
+		return userRepository.findById(id).orElseThrow(() -> new UserNotFoundException("User not found!"));
 	}
 	
 	public UserModel updateUser(Long id, UserModel user) {
-		UserModel listUser = userRepository.findById(id).orElse(null);
-		if(listUser != null) {
-			listUser.setEmail(user.getEmail());
-			listUser.setUsername(user.getUsername());
-			listUser.setPassword(user.getPassword());
+		UserModel listUser = userRepository.findById(id).orElseThrow(() -> new UserNotFoundException("User not found!"));
+
+		listUser.setEmail(user.getEmail());
+		listUser.setUsername(user.getUsername());
+		listUser.setPassword(user.getPassword());
 			
-			return userRepository.save(listUser);
-		}
-		
-		return null;
+		return userRepository.save(listUser);
 	}
 	
-	public boolean deleteUser(Long id) {
-		UserModel user = userRepository.findById(id).orElse(null);
-		if(user != null) {
-			userRepository.delete(user);
-			return true;
-		}
-		
-		return false;
+	public void deleteUser(Long id) {
+		UserModel user = userRepository.findById(id).orElseThrow(() -> new UserNotFoundException("User not found!"));
+		userRepository.delete(user);
 	}
 }

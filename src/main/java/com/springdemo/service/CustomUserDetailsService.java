@@ -2,6 +2,8 @@ package com.springdemo.service;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.userdetails.User;
+
+import com.springdemo.Exceptions.UserNotFoundException;
 import com.springdemo.model.UserModel;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
@@ -16,8 +18,8 @@ public class CustomUserDetailsService implements UserDetailsService{
 	private UserRepository userRepository;
 
 	@Override
-	public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
-		UserModel user = userRepository.getUserModelByUsername(username).orElse(null); //Később kell HIBA KEZELÉS
+	public UserDetails loadUserByUsername(String username) {
+		UserModel user = userRepository.getUserModelByUsername(username).orElseThrow(() -> (new UserNotFoundException("User not found!")));
 		
 		return User.builder().username(user.getUsername())
 				.password(user.getPassword())
