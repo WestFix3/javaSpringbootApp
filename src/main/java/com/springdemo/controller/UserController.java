@@ -2,6 +2,10 @@ package com.springdemo.controller;
 
 import com.springdemo.Exceptions.UserAlreadyExistsException;
 import com.springdemo.Exceptions.UserNotFoundException;
+import com.springdemo.dto.LoginRequestDTO;
+import com.springdemo.dto.UserRequestDTO;
+import com.springdemo.dto.UserResponseDTO;
+import com.springdemo.dto.UserUpdateDTO;
 import com.springdemo.model.UserModel;
 import com.springdemo.service.JwtService;
 import com.springdemo.service.UserService;
@@ -37,13 +41,13 @@ public class UserController{
 	
 	//Regisztrálás
 	@PostMapping("/register")
-	public ResponseEntity<UserModel> register(@Valid @RequestBody UserModel user) {
+	public ResponseEntity<UserResponseDTO> register(@Valid @RequestBody UserRequestDTO user) {
 		return ResponseEntity.status(HttpStatus.CREATED).body(userService.register(user));
 	}
 	
 	//Bejelentkezés
 	@PostMapping("/login")
-	public ResponseEntity<String> login(@RequestBody UserModel user) {
+	public ResponseEntity<String> login(@Valid @RequestBody LoginRequestDTO user) {
 		return ResponseEntity.ok(userService.login(user));
 	}
 	
@@ -55,7 +59,7 @@ public class UserController{
 	
 	//Felhasználó profilja
 	@GetMapping("/profile")
-	public ResponseEntity<UserModel> profileSelf(Authentication authentication){
+	public ResponseEntity<UserResponseDTO> profileSelf(Authentication authentication){
 		return ResponseEntity.ok(userService.profileSelf(authentication));
 	}
 	
@@ -75,30 +79,21 @@ public class UserController{
 	
 	//Felhasználó frissítése
 	@PutMapping("/admin/update/{id}")
-	public ResponseEntity<UserModel> updateUser(@PathVariable Long id, @RequestBody UserModel user)  {
-		UserModel updated = userService.updateUser(id, user);
-		if(updated == null) {
-			return ResponseEntity.notFound().build();
-		}
-		
-		return ResponseEntity.ok(updated);
+	public ResponseEntity<UserResponseDTO> updateUser(@PathVariable Long id, 
+			@Valid @RequestBody UserUpdateDTO user)  {
+		return ResponseEntity.ok(userService.updateUser(id, user));
 	}
 	
 	//Felhasználó keresése
 	@GetMapping("/admin/search/{id}")
-	public ResponseEntity<UserModel> getUser(@PathVariable Long id){
-		UserModel foundUser = userService.getUser(id);
-		if(foundUser == null) {
-			return ResponseEntity.notFound().build();
-		}
-		return ResponseEntity.ok(foundUser);
+	public ResponseEntity<UserResponseDTO> getUser(@PathVariable Long id){
+		return ResponseEntity.ok(userService.getUser(id));
 	}
 	
 	//Felhasználók lekérése ADMIN FUNKCIÓ
 	@GetMapping("/admin/users")
-	public ResponseEntity<List<UserModel>> getAll(){
-		List<UserModel> users = userService.getAll();
-		return ResponseEntity.ok(users);
+	public ResponseEntity<List<UserResponseDTO>> getAll(){
+		return ResponseEntity.ok(userService.getAll());
 	}
 	
 	@ExceptionHandler(UserNotFoundException.class)

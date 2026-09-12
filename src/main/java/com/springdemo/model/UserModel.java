@@ -16,20 +16,24 @@ public class UserModel{
 	@Id
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
 	private Long id;
-	@NotBlank(message = "Email nem lehet üres!")
-    @Email(message = "Érvénytelen email formátum!")
 	@Column(unique = true, nullable = false, name = "email")
 	private String email;
-	@NotBlank(message = "Felhasználónév nem lehet üres!")
 	@Column(unique = true, nullable = false, name = "username")
 	private String username;
-	@NotBlank(message = "Jelszó nem lehet üres!")
 	@Column(nullable = false, name = "password")
 	private String password;
 	private String role;
 	
 	public UserModel() {}
 	
+	public UserModel(String email, String username, String password, String role) {
+		super();
+		this.email = email;
+		this.username = username;
+		this.password = password;
+		this.role = role;
+	}
+
 	public String getEmail() {
 		return email;
 	}

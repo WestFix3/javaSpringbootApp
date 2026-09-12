@@ -39,7 +39,7 @@ public class SecurityConfig {
 	        .requestMatchers(
 	            "/users/register",
 	            "/users/login",
-	            "/h2-console/**" //http://localhost:8080/h2-console
+	            "/h2-console/**" //http://localhost:8080/h2-console (Itt hozzá adhatunk admin-t teszthez)
 	        ).permitAll()
 	        .requestMatchers("/users/admin/**").hasRole("ADMIN")
 	        .anyRequest().authenticated()

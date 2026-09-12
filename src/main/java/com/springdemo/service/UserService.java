@@ -10,6 +10,10 @@ import org.springframework.stereotype.Service;
 
 import com.springdemo.Exceptions.UserAlreadyExistsException;
 import com.springdemo.Exceptions.UserNotFoundException;
+import com.springdemo.dto.LoginRequestDTO;
+import com.springdemo.dto.UserRequestDTO;
+import com.springdemo.dto.UserResponseDTO;
+import com.springdemo.dto.UserUpdateDTO;
 import com.springdemo.model.UserModel;
 import com.springdemo.repository.UserRepository;
 
@@ -28,17 +32,18 @@ public class UserService{
 		this.jwtService = jwtService;
 	}
 	
-	public UserModel register(UserModel user) {
+	public UserResponseDTO register(UserRequestDTO user) {
 		if(userRepository.getUserModelByUsername(user.getUsername()).isPresent() ||
 				userRepository.getUserModelByEmail(user.getEmail()).isPresent()) {
 			throw new UserAlreadyExistsException("Username or email already exists!");
 		}
-		user.setPassword(passwordEncoder.encode(user.getPassword()));
-		user.setRole("USER"); //Alapbol az legyen
-		return userRepository.save(user);
+		UserModel newUser = new UserModel(user.getEmail(), user.getUsername(),
+				passwordEncoder.encode(user.getPassword()), "USER");
+		userRepository.save(newUser);
+		return new UserResponseDTO(newUser);
 	}
 	
-	public String login(UserModel user) {
+	public String login(LoginRequestDTO user) {
 	    Authentication authentication =
 	            authenticationManager.authenticate(
 	                    new UsernamePasswordAuthenticationToken(
@@ -50,18 +55,19 @@ public class UserService{
 	    return jwtService.generateToken(authentication.getName());
 	}
 	
-	public String logout(Authentication authentication) { //Gondolkoztam blacklisten, de ide nem éri meg
+	//Gondolkoztam blacklisten, de ide nem éri meg
+	public String logout(Authentication authentication) {
 	    String username = authentication.getName();
 	    return "User logged out successfully: " + username;
 	}
 	
 	//User Funkciók
 	
-	public UserModel profileSelf(Authentication authentication) {
+	public UserResponseDTO profileSelf(Authentication authentication) {
 		String username = authentication.getName();
 		UserModel user = userRepository.getUserModelByUsername(username).orElseThrow(
 												() -> new UserNotFoundException("User not found!"));
-		return user;
+		return new UserResponseDTO(user);
 	}
 	
 	public String deleteSelf(Authentication authentication) {
@@ -75,26 +81,29 @@ public class UserService{
 	
 	//ADMIN FUNKCIÓK
 	
-	public List<UserModel> getAll(){
-		return userRepository.findAll();
+	public List<UserResponseDTO> getAll(){
+		return userRepository.findAll().stream().map(x -> new UserResponseDTO(x)).toList();
 	}
 	
-	public UserModel getUser(Long id) {
-		return userRepository.findById(id).orElseThrow(() -> new UserNotFoundException("User not found!"));
+	public UserResponseDTO getUser(Long id) {
+		return new UserResponseDTO(userRepository.findById(id).
+				orElseThrow(() -> new UserNotFoundException("User not found!")));
 	}
 	
-	public UserModel updateUser(Long id, UserModel user) {
-		UserModel listUser = userRepository.findById(id).orElseThrow(() -> new UserNotFoundException("User not found!"));
+	public UserResponseDTO updateUser(Long id, UserUpdateDTO user) {
+		UserModel listUser = userRepository.findById(id).orElseThrow(
+				() -> new UserNotFoundException("User not found!"));
 
 		listUser.setEmail(user.getEmail());
 		listUser.setUsername(user.getUsername());
-		listUser.setPassword(user.getPassword());
 			
-		return userRepository.save(listUser);
+		userRepository.save(listUser);
+		return new UserResponseDTO(listUser);
 	}
 	
 	public void deleteUser(Long id) {
-		UserModel user = userRepository.findById(id).orElseThrow(() -> new UserNotFoundException("User not found!"));
+		UserModel user = userRepository.findById(id).orElseThrow(
+				() -> new UserNotFoundException("User not found!"));
 		userRepository.delete(user);
 	}
 }
