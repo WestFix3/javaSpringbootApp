@@ -37,6 +37,10 @@ public class SecurityConfig {
 
 	    .authorizeHttpRequests(auth -> auth
 	        .requestMatchers(
+	        	"/help",
+	        	"/help/users",
+	        	"/help/tasks",
+	        	"/help/peldak",
 	            "/users/register",
 	            "/users/login",
 	            "/h2-console/**" //http://localhost:8080/h2-console (Itt hozzá adhatunk admin-t teszthez)

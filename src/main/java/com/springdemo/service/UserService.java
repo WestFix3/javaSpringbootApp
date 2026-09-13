@@ -70,13 +70,12 @@ public class UserService{
 		return new UserResponseDTO(user);
 	}
 	
-	public String deleteSelf(Authentication authentication) {
+	public void deleteSelf(Authentication authentication) {
 		String name = authentication.getName();
 		UserModel user = userRepository.getUserModelByUsername(name).orElseThrow(
 												() ->  new UserNotFoundException("User not found!"));
 		userRepository.delete(user);
 		logout(authentication);
-		return "User deleted Succesfully!";
 	}
 	
 	//ADMIN FUNKCIÓK

@@ -6,11 +6,8 @@ import com.springdemo.dto.LoginRequestDTO;
 import com.springdemo.dto.UserRequestDTO;
 import com.springdemo.dto.UserResponseDTO;
 import com.springdemo.dto.UserUpdateDTO;
-import com.springdemo.model.UserModel;
-import com.springdemo.service.JwtService;
 import com.springdemo.service.UserService;
 
-import jakarta.servlet.http.HttpSession;
 import jakarta.validation.Valid;
 
 import java.util.List;
@@ -65,8 +62,9 @@ public class UserController{
 	
 	//Felhasználó harakiri
 	@DeleteMapping("/me")
-	public ResponseEntity<String> deleteSelf(Authentication authentication){
-		return ResponseEntity.ok(userService.deleteSelf(authentication));
+	public ResponseEntity<Void> deleteSelf(Authentication authentication){
+		userService.deleteSelf(authentication);
+		return ResponseEntity.noContent().build();
 	}
 	
 	//Felhasználó törlése

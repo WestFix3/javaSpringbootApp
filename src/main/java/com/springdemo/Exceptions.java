@@ -15,4 +15,11 @@ public class Exceptions{
 			super(message);
 		}
 	}
+	
+	//Feladat nem található
+	public static class TaskNotFoundException extends RuntimeException{
+		public TaskNotFoundException(String message) {
+			super(message);
+		}
+	}
 }
