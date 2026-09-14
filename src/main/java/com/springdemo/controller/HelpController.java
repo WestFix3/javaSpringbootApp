@@ -5,12 +5,17 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.responses.ApiResponse;
+
 @RestController
 @RequestMapping("/help")
 public class HelpController {
 	
 	@GetMapping
-    public ResponseEntity<String> help() {
+	@Operation(summary = "API használati útmutató")
+	@ApiResponse(responseCode = "200", description = "Sikeres lekérés")
+	public ResponseEntity<String> help() {
         String help = """
                 
                 =========================
@@ -31,7 +36,9 @@ public class HelpController {
         return ResponseEntity.ok(help);
     }
 
-    @GetMapping("/users")
+	@GetMapping("/users")
+	@Operation(summary = "User API használati útmutató")
+	@ApiResponse(responseCode = "200", description = "Sikeres lekérés")
     public ResponseEntity<String> userHelp() {
         String help = """
                 
@@ -109,7 +116,9 @@ public class HelpController {
         return ResponseEntity.ok(help);
     }
 
-    @GetMapping("/tasks")
+	@GetMapping("/tasks")
+	@Operation(summary = "Task API használati útmutató")
+	@ApiResponse(responseCode = "200", description = "Sikeres lekérés")
     public ResponseEntity<String> taskHelp() {
         String help = """
                 
@@ -181,28 +190,38 @@ public class HelpController {
     }
     
 	@GetMapping("/peldak")
-	public ResponseEntity<String> peldak(){
-		String pelda = "User létrehozás:\r\n"
-		        + "{\r\n"
-		        + "    \"username\": \"asd\",\r\n"
-		        + "    \"password\": \"asd\",\r\n"
-		        + "    \"email\": \"asd@asd.com\"\r\n"
-		        + "}\r\n"
-		        + "\r\n"
-		        + "Task létrehozás:\r\n"
-		        + "{\r\n"
-		        + "    \"title\": \"cim\",\r\n"
-		        + "    \"description\": \"valami szöveg\",\r\n"
-		        + "    \"priority\": \"alap\",\r\n"
-		        + "    \"dueDate\": \"2026-09-15\"\r\n"
-		        + "}\r\n"
-		        + "\r\n"
-		        + "User to admin:\r\n"
-		        + "http://localhost:8080/h2-console\r\n"
-		        + "\r\n"
-		        + "UPDATE users\r\n"
-		        + "SET role = 'ADMIN'\r\n"
-		        + "WHERE username = 'asd';";
-		return ResponseEntity.ok(pelda);
-	}
+	@Operation(summary = "API példák lekérése")
+	@ApiResponse(responseCode = "200", description = "Sikeres lekérés")
+    public ResponseEntity<String> peldak(){
+
+        String pelda = "User létrehozás:\r\n"
+                + "{\r\n"
+                + "    \"username\": \"asd\",\r\n"
+                + "    \"password\": \"asd\",\r\n"
+                + "    \"email\": \"asd@asd.com\"\r\n"
+                + "}\r\n"
+                + "\r\n"
+                + "Task létrehozás:\r\n"
+                + "{\r\n"
+                + "    \"title\": \"cim\",\r\n"
+                + "    \"description\": \"valami szöveg\",\r\n"
+                + "    \"priority\": \"alap\",\r\n"
+                + "    \"dueDate\": \"2026-09-15\"\r\n"
+                + "}\r\n"
+                + "\r\n"
+                + "User to admin:\r\n"
+                + "http://localhost:8080/h2-console\r\n"
+                + "\r\n"
+                + "UPDATE users\r\n"
+                + "SET role = 'ADMIN'\r\n"
+                + "WHERE username = 'asd';\r\n"
+                + "\r\n"
+                + "Swagger UI:\r\n"
+                + "http://localhost:8080/swagger-ui/index.html\r\n"
+                + "\r\n"
+                + "OpenAPI JSON:\r\n"
+                + "http://localhost:8080/v3/api-docs";
+
+        return ResponseEntity.ok(pelda);
+    }
 }

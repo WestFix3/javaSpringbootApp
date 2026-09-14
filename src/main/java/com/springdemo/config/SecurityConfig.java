@@ -43,7 +43,9 @@ public class SecurityConfig {
 	        	"/help/peldak",
 	            "/users/register",
 	            "/users/login",
-	            "/h2-console/**" //http://localhost:8080/h2-console (Itt hozzá adhatunk admin-t teszthez)
+	            "/swagger-ui/**", //http://localhost:8080/swagger-ui/index.html (Swagger UI)
+	            "/v3/**",		  //http://localhost:8080/v3/api-docs (OpenApi json)
+	            "/h2-console/**"  //http://localhost:8080/h2-console (Itt hozzá adhatunk admin-t teszthez)
 	        ).permitAll()
 	        .requestMatchers("/users/admin/**").hasRole("ADMIN")
 	        .anyRequest().authenticated()

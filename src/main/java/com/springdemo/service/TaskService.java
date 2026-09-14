@@ -3,14 +3,16 @@ package com.springdemo.service;
 import java.util.List;
 
 import org.springframework.beans.BeanUtils;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Service;
 
-import com.springdemo.Exceptions.TaskNotFoundException;
-import com.springdemo.Exceptions.UserNotFoundException;
 import com.springdemo.dto.TaskRequestDTO;
 import com.springdemo.dto.TaskResponseDTO;
+import com.springdemo.exceptions.Exceptions.TaskNotFoundException;
+import com.springdemo.exceptions.Exceptions.UserNotFoundException;
 import com.springdemo.model.TaskModel;
 import com.springdemo.model.UserModel;
 import com.springdemo.repository.TaskRepository;
@@ -81,7 +83,8 @@ public class TaskService {
 	
 	//ADMIN
 	//Minden feladat kiadása
-	public List<TaskResponseDTO> getAllTasks(){
-		return taskRepository.findAll().stream().map(x -> new TaskResponseDTO(x)).toList();
+	public Page<TaskResponseDTO> getAllTasks(Pageable pageable){
+		return taskRepository.findAll(pageable).map(x -> new TaskResponseDTO(x));
+		//return taskRepository.findAll().stream().map(x -> new TaskResponseDTO(x)).toList();
 	}
 }

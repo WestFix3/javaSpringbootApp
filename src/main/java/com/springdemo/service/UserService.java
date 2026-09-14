@@ -1,19 +1,19 @@
 package com.springdemo.service;
 
-import java.util.List;
-
 import org.springframework.security.core.Authentication;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.stereotype.Service;
 
-import com.springdemo.Exceptions.UserAlreadyExistsException;
-import com.springdemo.Exceptions.UserNotFoundException;
 import com.springdemo.dto.LoginRequestDTO;
 import com.springdemo.dto.UserRequestDTO;
 import com.springdemo.dto.UserResponseDTO;
 import com.springdemo.dto.UserUpdateDTO;
+import com.springdemo.exceptions.Exceptions.UserAlreadyExistsException;
+import com.springdemo.exceptions.Exceptions.UserNotFoundException;
 import com.springdemo.model.UserModel;
 import com.springdemo.repository.UserRepository;
 
@@ -80,8 +80,9 @@ public class UserService{
 	
 	//ADMIN FUNKCIÓK
 	
-	public List<UserResponseDTO> getAll(){
-		return userRepository.findAll().stream().map(x -> new UserResponseDTO(x)).toList();
+	public Page<UserResponseDTO> getAll(Pageable pageable){
+		return userRepository.findAll(pageable).map(x -> new UserResponseDTO(x));
+		//return userRepository.findAll().stream().map(x -> new UserResponseDTO(x)).toList();
 	}
 	
 	public UserResponseDTO getUser(Long id) {

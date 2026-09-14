@@ -3,7 +3,7 @@ package com.springdemo.service;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.userdetails.User;
 
-import com.springdemo.Exceptions.UserNotFoundException;
+import com.springdemo.exceptions.Exceptions.UserNotFoundException;
 import com.springdemo.model.UserModel;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;

@@ -1,4 +1,4 @@
-package com.springdemo;
+package com.springdemo.exceptions;
 
 public class Exceptions{
 	
