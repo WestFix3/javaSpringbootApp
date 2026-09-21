@@ -42,7 +42,7 @@ public class TaskService {
 	//Feladatok lekérése felhasználó szerint
 	public List<TaskResponseDTO> getByUser(Authentication authentication){
 		UserModel user = userRepository.getUserModelByUsername(authentication.getName()).orElseThrow(
-				() -> new UsernameNotFoundException("User not found!"));
+				() -> new UserNotFoundException("User not found!"));
 		
 		return taskRepository.findByUser(user).stream().map(x -> new TaskResponseDTO(x)).toList();
 	}
@@ -61,7 +61,7 @@ public class TaskService {
 	//Feladat törlése
 	public void deleteTask(Long id, Authentication authentication) {
 		UserModel user = userRepository.getUserModelByUsername(authentication.getName()).orElseThrow(
-				() -> new UsernameNotFoundException("User not found!"));
+				() -> new UserNotFoundException("User not found!"));
 		TaskModel task = taskRepository.findByUser(user).stream().filter(x -> x.getId().equals(id)).
 				findFirst().orElseThrow(() -> new TaskNotFoundException("Task not found!"));
 		taskRepository.delete(task);
@@ -70,7 +70,7 @@ public class TaskService {
 	//Teljesitve érték változtatása
 	public TaskResponseDTO changeComplete(Long id, boolean completed, Authentication authentication) {
 		UserModel user = userRepository.getUserModelByUsername(authentication.getName()).orElseThrow(
-				() -> new UsernameNotFoundException("User not found!"));
+				() -> new UserNotFoundException("User not found!"));
 		TaskModel task = taskRepository.findByUser(user).stream().filter(x -> x.getId().equals(id)).
 				findFirst().orElseThrow(() -> new TaskNotFoundException("Task not found!"));
 		if(task.isCompleted() != completed) {

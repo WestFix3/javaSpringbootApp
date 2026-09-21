@@ -10,6 +10,7 @@ import com.springdemo.dto.ErrorResponseDTO;
 import com.springdemo.exceptions.Exceptions.TaskNotFoundException;
 import com.springdemo.exceptions.Exceptions.UserAlreadyExistsException;
 import com.springdemo.exceptions.Exceptions.UserNotFoundException;
+import org.springframework.security.authentication.BadCredentialsException;
 
 @RestControllerAdvice
 public class GlobalExceptionHandler {
@@ -32,5 +33,12 @@ public class GlobalExceptionHandler {
 	@ExceptionHandler(TaskNotFoundException.class)
 	public ResponseEntity<ErrorResponseDTO> handleTaskNotFound(TaskNotFoundException ex){
 		return ResponseEntity.status(HttpStatus.NOT_FOUND).body(new ErrorResponseDTO(404, ex.getMessage()));
+	}
+	
+	@ExceptionHandler(BadCredentialsException.class)
+	public ResponseEntity<ErrorResponseDTO> handleBadCredentials(BadCredentialsException ex) {
+	    return ResponseEntity
+	            .status(HttpStatus.UNAUTHORIZED)
+	            .body(new ErrorResponseDTO(401, ex.getMessage()));
 	}
 }
