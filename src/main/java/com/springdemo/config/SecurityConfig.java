@@ -45,9 +45,12 @@ public class SecurityConfig {
 	            "/users/login",
 	            "/swagger-ui/**", //http://localhost:8080/swagger-ui/index.html (Swagger UI)
 	            "/v3/**",		  //http://localhost:8080/v3/api-docs (OpenApi json)
-	            "/h2-console/**"  //http://localhost:8080/h2-console (Itt hozzá adhatunk admin-t teszthez)
+	            "/h2-console/**",  //http://localhost:8080/h2-console (Itt hozzá adhatunk admin-t teszthez)
+	            "/actuator/health",        // Alkalmazás állapotának ellenőrzése
+	            "/actuator/metrics/**"     // CPU, RAM és egyéb metrikák lekérése
 	        ).permitAll()
 	        .requestMatchers("/users/admin/**").hasRole("ADMIN")
+	        .requestMatchers("/tasks/admin/**").hasRole("ADMIN")
 	        .anyRequest().authenticated()
 	    )
 	    

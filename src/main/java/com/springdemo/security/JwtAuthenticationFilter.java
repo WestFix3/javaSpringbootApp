@@ -1,6 +1,7 @@
 package com.springdemo.security;
 
 import java.io.IOException;
+import io.jsonwebtoken.JwtException;
 
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.context.SecurityContextHolder;
@@ -29,23 +30,24 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter{
 	@Override
 	protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain filterChain)
 			throws ServletException, IOException {
-
 	    String authHeader = request.getHeader("Authorization");
 		String token = null;
 		String username = null;
 		
 		if(authHeader != null && authHeader.startsWith("Bearer ")) {
 			token = authHeader.substring(7);
-			username = jwtService.extractUsername(token);
+			try {
+			    username = jwtService.extractUsername(token);
+			} catch (JwtException | IllegalArgumentException e) {
+			    response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
+			    return;
+			}
 		}
 		
 		if (username != null && SecurityContextHolder.getContext().getAuthentication() == null) {
-
-		    UserDetails userDetails =
-		            customUserDetailsService.loadUserByUsername(username);
+		    UserDetails userDetails = customUserDetailsService.loadUserByUsername(username);
 
 		    if (jwtService.isValid(token)) {
-
 		        UsernamePasswordAuthenticationToken authToken =
 		                new UsernamePasswordAuthenticationToken(
 		                        userDetails,
@@ -55,8 +57,6 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter{
 		        SecurityContextHolder.getContext().setAuthentication(authToken);
 		    }
 		}
-
-
         filterChain.doFilter(request, response);
 	}
 	
