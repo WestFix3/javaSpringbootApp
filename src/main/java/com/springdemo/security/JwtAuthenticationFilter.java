@@ -1,6 +1,7 @@
 package com.springdemo.security;
 
 import java.io.IOException;
+import io.jsonwebtoken.JwtException;
 
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.context.SecurityContextHolder;
@@ -35,7 +36,12 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter{
 		
 		if(authHeader != null && authHeader.startsWith("Bearer ")) {
 			token = authHeader.substring(7);
-			username = jwtService.extractUsername(token);
+			try {
+			    username = jwtService.extractUsername(token);
+			} catch (JwtException | IllegalArgumentException e) {
+			    response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
+			    return;
+			}
 		}
 		
 		if (username != null && SecurityContextHolder.getContext().getAuthentication() == null) {

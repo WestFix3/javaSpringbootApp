@@ -48,6 +48,7 @@ public class SecurityConfig {
 	            "/h2-console/**"  //http://localhost:8080/h2-console (Itt hozzá adhatunk admin-t teszthez)
 	        ).permitAll()
 	        .requestMatchers("/users/admin/**").hasRole("ADMIN")
+	        .requestMatchers("/tasks/admin/**").hasRole("ADMIN")
 	        .anyRequest().authenticated()
 	    )
 	    
